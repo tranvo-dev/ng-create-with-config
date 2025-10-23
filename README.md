@@ -1,4 +1,4 @@
-# Init Custom Angular App
+# ng-create-with-config
 Save time by skipping the hassle of manually initializing and configuring your Angular project with the `ng-create-with-config` command.
 
 Just run it, and you're all set to start coding!
