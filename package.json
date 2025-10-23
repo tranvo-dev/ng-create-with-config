@@ -1,6 +1,6 @@
 {
   "name": "ng-create-with-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Initialize Angular project with Prettier, ESLint, and Tailwind",
   "bin": {
     "ng-create-with-config": "./init.js"
@@ -15,7 +15,6 @@
     "scaffold",
     "prettier",
     "eslint",
-    "primeng",
     "tailwind"
   ],
   "author": "Tran Vo <tranvo.dev@gmail.com>",
