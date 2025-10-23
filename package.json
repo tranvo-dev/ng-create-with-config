@@ -1,0 +1,30 @@
+{
+  "name": "ng-create-with-config",
+  "version": "1.0.0",
+  "description": "Initialize Angular project with Prettier, ESLint, and Tailwind",
+  "bin": {
+    "ng-create-with-config": "./init.js"
+  },
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "angular",
+    "cli",
+    "init",
+    "scaffold",
+    "prettier",
+    "eslint",
+    "primeng",
+    "tailwind"
+  ],
+  "author": "Tran Vo <tranvo.dev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tranvo-dev/ng-create-with-config.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
