@@ -31,6 +31,12 @@ npm install -g ng-create-with-config
 ng-create-with-config my-project-name
 ```
 
+### Developer mode
+
+```bash
+node ng-create-with-config/init.js my-app
+```
+
 ### License
 
 MIT
