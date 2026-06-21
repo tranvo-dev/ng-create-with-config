@@ -10,6 +10,7 @@ const colors = {
   green: '\x1b[32m',
   blue: '\x1b[34m',
   yellow: '\x1b[33m',
+  red: '\x1b[31m',
 };
 
 function printMessage(message) {
@@ -29,6 +30,63 @@ function executeCommand(command, options = {}) {
   }
 }
 
+function captureCommand(command) {
+  return execSync(command, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+}
+
+function printError(message) {
+  console.error(`${colors.red}Error:${colors.reset} ${message}`);
+}
+
+// Minimum versions this scaffold supports
+const MIN_NODE_MAJOR = 14;
+const MIN_NG_MAJOR = 17; // eslint.config.js + tailwind v4 setup assume Angular 17+
+
+// Verify Node and Angular CLI versions before doing anything.
+// Detects unsupported runtimes early so the user gets a clear message
+// instead of a confusing failure mid-scaffold.
+function checkVersions() {
+  // 1. Node version vs package.json engines
+  const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+  if (nodeMajor < MIN_NODE_MAJOR) {
+    printError(
+      `Node ${process.version} is not supported. Requires Node >=${MIN_NODE_MAJOR}.0.0.`
+    );
+    process.exit(1);
+  }
+
+  // 2. Angular CLI installed + major version
+  let ngVersionOutput;
+  try {
+    ngVersionOutput = captureCommand('ng version');
+  } catch (error) {
+    printError(
+      'Angular CLI not found. Install it first: npm install -g @angular/cli'
+    );
+    process.exit(1);
+  }
+
+  const match = ngVersionOutput.match(/Angular CLI:\s*(\d+)\.\d+\.\d+/);
+  const ngMajor = match ? parseInt(match[1], 10) : null;
+  if (!ngMajor) {
+    printWarning('Could not detect Angular CLI version. Continuing anyway.');
+    return null;
+  }
+
+  if (ngMajor < MIN_NG_MAJOR) {
+    printError(
+      `Angular CLI ${ngMajor}.x is not supported. ` +
+        `This scaffold needs Angular >=${MIN_NG_MAJOR} ` +
+        `(uses flat eslint.config.js and Tailwind v4). ` +
+        `Upgrade: npm install -g @angular/cli@latest`
+    );
+    process.exit(1);
+  }
+
+  printMessage(`Detected Node ${process.version}, Angular CLI ${ngMajor}.x`);
+  return ngMajor;
+}
+
 // Check if project name is provided
 const projectName = process.argv[2];
 
@@ -37,6 +95,9 @@ if (!projectName) {
   console.error('   or: node init.js <project-name>');
   process.exit(1);
 }
+
+// Gate: verify Node + Angular CLI before scaffolding
+const ngMajor = checkVersions();
 
 printMessage(`Creating Angular project: ${projectName}`);
 
@@ -49,11 +110,14 @@ process.chdir(projectName);
 printMessage('Installing dependencies...');
 
 // Install Tailwind CSS
-executeCommand('npm install tailwindcss @tailwindcss/postcss postcss');
+executeCommand('npm install tailwindcss@^4 @tailwindcss/postcss@^4 postcss');
 
-// Install ESLint
-executeCommand('npm install -D @angular-eslint/schematics');
-executeCommand('ng add @angular-eslint/schematics --skip-confirmation');
+// Install ESLint — ng add resolves the version matching the Angular major.
+// Pin explicitly when we detected the major to avoid mismatch.
+const eslintSchematics = ngMajor
+  ? `@angular-eslint/schematics@${ngMajor}`
+  : '@angular-eslint/schematics';
+executeCommand(`ng add ${eslintSchematics} --skip-confirmation`);
 
 // Install Prettier
 executeCommand('npm install prettier prettier-eslint eslint-config-prettier eslint-plugin-prettier --save-dev');
